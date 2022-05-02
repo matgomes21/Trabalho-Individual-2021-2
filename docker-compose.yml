@@ -1,6 +1,19 @@
 version: "3.2"
 
 services:
+  app:
+    build:
+      context: aplicacao/
+      dockerfile: Dockerfile
+    volumes:
+      - ./aplicacao:/app
+    ports:
+      - 3000:3000
+    networks:
+      - app
+    depends_on:
+      - db
+
   db:
     image: postgres:13
     restart: always
@@ -16,7 +29,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - app
-
+      
 volumes:
   postgres_data:
 
