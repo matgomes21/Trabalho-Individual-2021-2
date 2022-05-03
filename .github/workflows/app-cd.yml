@@ -1,0 +1,34 @@
+name: App-CD
+
+on:
+  workflow_call:
+  workflow_dispatch:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  app:
+    uses: matgomes21/Trabalho-Individual-2021-2/.github/workflows/app-ci.yml@main
+  deploy:
+    name: post docker image
+    runs-on: ubuntu-latest
+    needs: [app]
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: checkout action
+        uses: actions/checkout@v2
+      - name: setup buildx action
+        uses: docker/setup-buildx-action@v1
+      - name: login action
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: build push action
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: matgomes21/app-gces
+          context: "{{defaultContext}}:aplicacao"
